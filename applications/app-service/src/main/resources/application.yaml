@@ -22,3 +22,15 @@ management:
         enabled: true
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+adapters:
+  postgres:
+    database: ${DATABASE_NAME}
+    host: localhost
+    port: ${DATABASE_PORT}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    pool:
+      initial-size: 12
+      max-size: 15
+      max-idle-time: 10
