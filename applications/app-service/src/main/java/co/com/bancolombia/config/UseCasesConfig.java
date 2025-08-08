@@ -6,7 +6,8 @@ import co.com.bancolombia.r2dbc.adapters.ProductRepositoryAdapter;
 import co.com.bancolombia.usecase.branch.AddBranchUseCase;
 import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
 import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
-import co.com.bancolombia.usecase.franchise.DeleteProductUseCase;
+import co.com.bancolombia.usecase.franchise.UpdateFranchiseNameUseCase;
+import co.com.bancolombia.usecase.product.DeleteProductUseCase;
 import co.com.bancolombia.usecase.product.AddProductUseCase;
 import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
 import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
@@ -49,5 +50,10 @@ public class UseCasesConfig {
         @Bean
         public UpdateBranchNameUseCase updateBranchNameUseCase(BranchRepositoryAdapter branchRepositoryAdapter) {
             return new UpdateBranchNameUseCase(branchRepositoryAdapter);
+        }
+
+        @Bean
+        public UpdateFranchiseNameUseCase updateFranchiseNameUseCase(FranchiseRepositoryAdapter franchiseRepositoryAdapter) {
+            return new UpdateFranchiseNameUseCase(franchiseRepositoryAdapter);
         }
 }
