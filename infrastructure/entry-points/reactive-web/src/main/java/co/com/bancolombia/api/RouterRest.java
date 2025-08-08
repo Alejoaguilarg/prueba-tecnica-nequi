@@ -19,6 +19,7 @@ public class RouterRest {
                 .andRoute(DELETE("/api/products/{id}"), handler::deleteProduct)
                 .andRoute(PATCH("/api/products/{id}/stock"), handler::updateProductStock)
                 .andRoute(PATCH("/api/products/{id}/name"), handler::updateProductName)
-                .andRoute(PATCH("/api/branches/{id}/name"), handler::updateBranchName);
+                .andRoute(PATCH("/api/branches/{id}/name"), handler::updateBranchName)
+                .andRoute(PATCH("/api/franchises/{id}/name"), handler::updateFranchiseName);
     }
 }

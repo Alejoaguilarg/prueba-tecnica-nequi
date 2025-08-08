@@ -1,6 +1,7 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.dto.request.UpdateBrachNameRequest;
+import co.com.bancolombia.api.dto.request.UpdateFranchiseNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
 import co.com.bancolombia.api.dto.response.BranchResponse;
@@ -13,7 +14,8 @@ import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.usecase.branch.AddBranchUseCase;
 import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
 import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
-import co.com.bancolombia.usecase.franchise.DeleteProductUseCase;
+import co.com.bancolombia.usecase.franchise.UpdateFranchiseNameUseCase;
+import co.com.bancolombia.usecase.product.DeleteProductUseCase;
 import co.com.bancolombia.usecase.product.AddProductUseCase;
 import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
 import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
@@ -37,6 +39,7 @@ public class Handler {
     private final UpdateProductStockUseCase updateProductStockUseCase;
     private final UpdateProductNameUseCase updateProductNameUseCase;
     private final UpdateBranchNameUseCase updateBranchNameUseCase;
+    private final UpdateFranchiseNameUseCase updateFranchiseNameUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -113,6 +116,19 @@ public class Handler {
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(new BranchResponse(updated.getName(), updated.getFranchiseId())));
+    }
+
+    public Mono<ServerResponse> updateFranchiseName(ServerRequest request) {
+        final long id = parseId(request.pathVariable("id"));
+
+        return request
+                .bodyToMono(UpdateFranchiseNameRequest.class)
+                .flatMap(updateFranchiseNameRequest -> updateFranchiseNameUseCase
+                        .execute(id,updateFranchiseNameRequest.name()))
+                .flatMap(updated -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(new FranchiseResponse(updated.getName())));
     }
 
     private Long parseId(String id) {
