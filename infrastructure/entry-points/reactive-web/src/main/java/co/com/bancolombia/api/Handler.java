@@ -1,12 +1,22 @@
 package co.com.bancolombia.api;
 
-import co.com.bancolombia.api.dto.UpdateProductNameRequest;
-import co.com.bancolombia.api.dto.UpdateStockRequest;
+import co.com.bancolombia.api.dto.request.UpdateBrachNameRequest;
+import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
+import co.com.bancolombia.api.dto.request.UpdateStockRequest;
+import co.com.bancolombia.api.dto.response.BranchResponse;
+import co.com.bancolombia.api.dto.response.FranchiseResponse;
+import co.com.bancolombia.api.dto.response.ProductResponse;
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.ex.BusinessRuleException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.product.Product;
-import co.com.bancolombia.usecase.*;
+import co.com.bancolombia.usecase.branch.AddBranchUseCase;
+import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
+import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
+import co.com.bancolombia.usecase.franchise.DeleteProductUseCase;
+import co.com.bancolombia.usecase.product.AddProductUseCase;
+import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
+import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -26,6 +36,7 @@ public class Handler {
     private final DeleteProductUseCase deleteProductUseCase;
     private final UpdateProductStockUseCase updateProductStockUseCase;
     private final UpdateProductNameUseCase updateProductNameUseCase;
+    private final UpdateBranchNameUseCase updateBranchNameUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -34,7 +45,7 @@ public class Handler {
                 .flatMap(saved -> ServerResponse
                         .created(URI.create("/api/franchises/"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(saved)
+                        .bodyValue(new FranchiseResponse(saved.getName()))
                 );
     }
 
@@ -45,7 +56,7 @@ public class Handler {
                 .flatMap(added -> ServerResponse
                         .created(URI.create("/api/branches/"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(added)
+                        .bodyValue(new BranchResponse(added.getName(), added.getFranchiseId()))
                 );
     }
 
@@ -56,7 +67,7 @@ public class Handler {
                 .flatMap(added -> ServerResponse
                         .created(URI.create("/api/products/"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(added)
+                        .bodyValue(new ProductResponse(added.getName(), added.getStock(), added.getBranchId()))
                 );
     }
 
@@ -75,7 +86,7 @@ public class Handler {
                 .flatMap(updated -> ServerResponse
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(updated));
+                        .bodyValue(new ProductResponse(updated.getName(), updated.getStock(), updated.getBranchId())));
     }
 
     public Mono<ServerResponse> updateProductName(ServerRequest request) {
@@ -87,7 +98,21 @@ public class Handler {
                 .flatMap(updated -> ServerResponse
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(updated)));
+                        .bodyValue(new ProductResponse(updated.getName(), updated.getStock(), updated.getBranchId())))
+                );
+    }
+
+    public Mono<ServerResponse> updateBranchName(ServerRequest request) {
+        final Long id = parseId(request.pathVariable("id"));
+
+        return request
+                .bodyToMono(UpdateBrachNameRequest.class)
+                .flatMap(updateBranchNameRequest -> updateBranchNameUseCase
+                        .execute(id, updateBranchNameRequest.name()))
+                .flatMap(updated -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(new BranchResponse(updated.getName(), updated.getFranchiseId())));
     }
 
     private Long parseId(String id) {

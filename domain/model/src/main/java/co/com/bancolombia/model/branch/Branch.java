@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Branch {
+
     private Long id;
     private Long branchId;
     private String name;

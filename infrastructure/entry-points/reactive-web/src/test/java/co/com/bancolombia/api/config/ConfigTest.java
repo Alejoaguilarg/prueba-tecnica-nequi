@@ -2,10 +2,10 @@ package co.com.bancolombia.api.config;
 
 import co.com.bancolombia.api.Handler;
 import co.com.bancolombia.api.RouterRest;
-import co.com.bancolombia.usecase.AddBranchUseCase;
-import co.com.bancolombia.usecase.AddProductUseCase;
-import co.com.bancolombia.usecase.CreateFranchiseUseCase;
-import co.com.bancolombia.usecase.DeleteProductUseCase;
+import co.com.bancolombia.usecase.branch.AddBranchUseCase;
+import co.com.bancolombia.usecase.product.AddProductUseCase;
+import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
+import co.com.bancolombia.usecase.franchise.DeleteProductUseCase;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
