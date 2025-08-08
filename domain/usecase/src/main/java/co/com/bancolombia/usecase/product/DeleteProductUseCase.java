@@ -1,4 +1,4 @@
-package co.com.bancolombia.usecase.franchise;
+package co.com.bancolombia.usecase.product;
 
 import co.com.bancolombia.model.product.gateways.IProductRepository;
 import reactor.core.publisher.Mono;

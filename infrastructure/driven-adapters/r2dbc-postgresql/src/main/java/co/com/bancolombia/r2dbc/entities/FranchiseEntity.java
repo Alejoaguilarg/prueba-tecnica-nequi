@@ -15,7 +15,7 @@ public class FranchiseEntity {
 
     @Id
     @Column("franchise_id")
-    private Integer franchiseId;
+    private Long franchiseId;
     @Column("name")
     private String name;
 }
