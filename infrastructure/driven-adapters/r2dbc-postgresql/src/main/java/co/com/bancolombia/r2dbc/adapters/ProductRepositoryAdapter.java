@@ -1,5 +1,6 @@
 package co.com.bancolombia.r2dbc.adapters;
 
+import co.com.bancolombia.model.ex.BusinessRuleException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.IProductRepository;
 import co.com.bancolombia.r2dbc.entities.ProductEntity;
@@ -26,7 +27,7 @@ public class ProductRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<Void> deleteProduct(Long id){
+    public Mono<Void> deleteProduct(Long id) {
         return repository.deleteById(id);
     }
 }

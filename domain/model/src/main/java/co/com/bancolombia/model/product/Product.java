@@ -12,6 +12,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class Product {
 
+    Long id;
     private String name;
     private Integer stock;
     private Long branchId;
