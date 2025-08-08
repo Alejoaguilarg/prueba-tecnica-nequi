@@ -103,4 +103,17 @@ class RouterRestTest {
 
         verify(handler).updateProductName(any());
     }
+
+    @Test
+    void shouldRouteToUpdateBranchName() {
+        when(handler.updateBranchName(any())).thenReturn(ServerResponse.ok().build());
+
+        client.patch()
+                .uri("/api/branches/10/name")
+                .body(BodyInserters.fromValue("another"))
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(handler).updateBranchName(any());
+    }
 }

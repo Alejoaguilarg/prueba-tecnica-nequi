@@ -1,4 +1,4 @@
-package co.com.bancolombia.usecase;
+package co.com.bancolombia.usecase.product;
 
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.IProductRepository;
