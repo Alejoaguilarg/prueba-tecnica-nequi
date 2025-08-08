@@ -2,7 +2,9 @@ package co.com.bancolombia.api;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.franchise.Franchise;
+import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.usecase.AddBranchUseCase;
+import co.com.bancolombia.usecase.AddProductUseCase;
 import co.com.bancolombia.usecase.CreateFranchiseUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -20,6 +22,7 @@ public class Handler {
 
     private final CreateFranchiseUseCase createFranchiseUseCase;
     private final AddBranchUseCase addBranchUseCase;
+    private final AddProductUseCase addProductUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -47,13 +50,34 @@ public class Handler {
                         .created(URI.create("/api/branches/"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(added)
-                        .onErrorResume(e -> ServerResponse
-                                .badRequest()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(Map.of(
-                                        "error", "No se pudo agregar la sucursal",
-                                        "details", e.getMessage()
-                                ))
-                        ));
+                )
+                .onErrorResume(e -> ServerResponse
+                        .badRequest()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(Map.of(
+                                "error", "No se pudo agregar la sucursal",
+                                "details", e.getMessage()
+                        ))
+                );
+    }
+
+    public Mono<ServerResponse> addProduct(ServerRequest request) {
+        return request
+                .bodyToMono(Product.class)
+                .flatMap(addProductUseCase::execute)
+                .flatMap(added -> ServerResponse
+                        .created(URI.create("/api/products/"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(added)
+                )
+                .onErrorResume(e -> ServerResponse
+                        .badRequest()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(Map.of(
+                                "error", "No se pudo agregar el producto",
+                                "details", e.getMessage()
+                        ))
+                );
+
     }
 }
