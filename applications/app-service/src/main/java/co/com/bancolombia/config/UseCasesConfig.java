@@ -3,7 +3,13 @@ package co.com.bancolombia.config;
 import co.com.bancolombia.r2dbc.adapters.BranchRepositoryAdapter;
 import co.com.bancolombia.r2dbc.adapters.FranchiseRepositoryAdapter;
 import co.com.bancolombia.r2dbc.adapters.ProductRepositoryAdapter;
-import co.com.bancolombia.usecase.*;
+import co.com.bancolombia.usecase.branch.AddBranchUseCase;
+import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
+import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
+import co.com.bancolombia.usecase.franchise.DeleteProductUseCase;
+import co.com.bancolombia.usecase.product.AddProductUseCase;
+import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
+import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,5 +44,10 @@ public class UseCasesConfig {
         @Bean
         public UpdateProductNameUseCase updateProductNameUseCase(ProductRepositoryAdapter productRepositoryAdapter) {
             return new UpdateProductNameUseCase(productRepositoryAdapter);
+        }
+
+        @Bean
+        public UpdateBranchNameUseCase updateBranchNameUseCase(BranchRepositoryAdapter branchRepositoryAdapter) {
+            return new UpdateBranchNameUseCase(branchRepositoryAdapter);
         }
 }

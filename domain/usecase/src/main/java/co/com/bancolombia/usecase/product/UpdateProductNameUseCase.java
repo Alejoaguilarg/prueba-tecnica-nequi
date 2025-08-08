@@ -1,27 +1,27 @@
-package co.com.bancolombia.usecase;
+package co.com.bancolombia.usecase.product;
 
 import co.com.bancolombia.model.ex.BusinessRuleException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.IProductRepository;
 import reactor.core.publisher.Mono;
 
-public class UpdateProductStockUseCase {
+public class UpdateProductNameUseCase {
 
     private final IProductRepository repository;
 
-    public UpdateProductStockUseCase(IProductRepository repository) {
+    public UpdateProductNameUseCase(IProductRepository repository) {
         this.repository = repository;
     }
 
-    public Mono<Product> execute(Long id, int stock) {
-        if (stock < 0) {
-            return Mono.error(new BusinessRuleException("Error","Stock debe ser mayor o igual a 0"));
+    public Mono<Product> execute(Long id, String name) {
+        if (name.length() < 2 || name.length() > 20) {
+            return Mono.error(new BusinessRuleException("Error", "Nombre de producto invalido"));
         }
 
         return repository.findById(id)
                 .switchIfEmpty(Mono.error(new BusinessRuleException("Error", "Producto no encontrado.")))
                 .flatMap(product -> {
-                    product.setStock(stock);
+                    product.setName(name);
                     return repository.saveProduct(product);
                 });
     }
