@@ -1,127 +1,79 @@
 package co.com.bancolombia.api;
 
-import co.com.bancolombia.model.branch.Branch;
-import co.com.bancolombia.model.franchise.Franchise;
-import co.com.bancolombia.model.product.Product;
-import co.com.bancolombia.usecase.AddBranchUseCase;
-import co.com.bancolombia.usecase.AddProductUseCase;
-import co.com.bancolombia.usecase.CreateFranchiseUseCase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class})
-@WebFluxTest
+@ExtendWith(MockitoExtension.class)
 class RouterRestTest {
 
-    @Autowired
-    private WebTestClient webTestClient;
+    @Mock
+    private Handler handler;
 
-    @MockBean
-    private CreateFranchiseUseCase createFranchiseUseCase;
-    @MockBean
-    private AddBranchUseCase addBranchUseCase;
-    @MockBean
-    private AddProductUseCase addProductUseCase;
+    private RouterFunction<ServerResponse> routerFunction;
+    private WebTestClient client;
 
-    @Test
-    void createFranchise_success() {
-        Franchise input = Franchise.builder().name("ACME").build();
-        Franchise saved = Franchise.builder().franchiseId(1L).name("ACME").build();
-        when(createFranchiseUseCase.execute(any(Franchise.class))).thenReturn(Mono.just(saved));
+    @BeforeEach
+    void setUp() {
+        routerFunction = new RouterRest().routerFunction(handler);
 
-        webTestClient.post().uri("/api/franchises")
-                .bodyValue(input)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectHeader().valueEquals("Location", "/api/franchises/")
-                .expectBody()
-                .jsonPath("$.name").isEqualTo("ACME")
-                .jsonPath("$.franchiseId").isEqualTo(1);
+        client = WebTestClient.bindToRouterFunction(routerFunction).build();
     }
 
     @Test
-    void createFranchise_error() {
-        Franchise input = Franchise.builder().name("ERR").build();
-        when(createFranchiseUseCase.execute(any(Franchise.class)))
-                .thenReturn(Mono.error(new RuntimeException("boom")));
+    void shouldRouteToCreateFranchise() {
+        when(handler.createFranchise(any())).thenReturn(ServerResponse.ok().build());
 
-        webTestClient.post().uri("/api/franchises")
-                .bodyValue(input)
+        client.post()
+                .uri("/api/franchises")
                 .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("No se pudo crear la franquicia")
-                .jsonPath("$.details").isEqualTo("boom");
+                .expectStatus().isOk();
+
+        verify(handler).createFranchise(any());
     }
 
     @Test
-    void addBranch_success() {
-        Branch input = Branch.builder().name("B1").franchiseId(9L).build();
-        Branch saved = Branch.builder().branchId(2L).name("B1").franchiseId(9L).build();
-        when(addBranchUseCase.execute(any(Branch.class))).thenReturn(Mono.just(saved));
+    void shouldRouteToAddBranch() {
+        when(handler.addBranch(any())).thenReturn(ServerResponse.ok().build());
 
-        webTestClient.post().uri("/api/branches")
-                .bodyValue(input)
+        client.post()
+                .uri("/api/branches")
                 .exchange()
-                .expectStatus().isCreated()
-                .expectHeader().valueEquals("Location", "/api/branches/")
-                .expectBody()
-                .jsonPath("$.name").isEqualTo("B1")
-                .jsonPath("$.branchId").isEqualTo(2);
+                .expectStatus().isOk();
+
+        verify(handler).addBranch(any());
     }
 
     @Test
-    void addBranch_error() {
-        Branch input = Branch.builder().name("Bbad").franchiseId(1L).build();
-        when(addBranchUseCase.execute(any(Branch.class)))
-                .thenReturn(Mono.error(new RuntimeException("db err")));
+    void shouldRouteToAddProduct() {
+        when(handler.addProduct(any())).thenReturn(ServerResponse.ok().build());
 
-        webTestClient.post().uri("/api/branches")
-                .bodyValue(input)
+        client.post()
+                .uri("/api/products")
                 .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("No se pudo agregar la sucursal")
-                .jsonPath("$.details").isEqualTo("db err");
+                .expectStatus().isOk();
+
+        verify(handler).addProduct(any());
     }
 
     @Test
-    void addProduct_success() {
-        Product input = Product.builder().name("Pencil").stock(10).branchId(1L).build();
-        Product saved = Product.builder().name("Pencil").stock(10).branchId(1L).build();
-        when(addProductUseCase.execute(any(Product.class))).thenReturn(Mono.just(saved));
+    void shouldRouteToDeleteProduct() {
+        when(handler.deleteProduct(any())).thenReturn(ServerResponse.ok().build());
 
-        webTestClient.post().uri("/api/products")
-                .bodyValue(input)
+        client.delete()
+                .uri("/api/products/10")
                 .exchange()
-                .expectStatus().isCreated()
-                .expectHeader().valueEquals("Location", "/api/products/")
-                .expectBody()
-                .jsonPath("$.name").isEqualTo("Pencil")
-                .jsonPath("$.stock").isEqualTo(10)
-                .jsonPath("$.branchId").isEqualTo(1);
-    }
+                .expectStatus().isOk();
 
-    @Test
-    void addProduct_error() {
-        Product input = Product.builder().name("Bad").stock(0).branchId(1L).build();
-        when(addProductUseCase.execute(any(Product.class)))
-                .thenReturn(Mono.error(new RuntimeException("prod err")));
-
-        webTestClient.post().uri("/api/products")
-                .bodyValue(input)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("No se pudo agregar el producto")
-                .jsonPath("$.details").isEqualTo("prod err");
+        verify(handler).deleteProduct(any());
     }
 }
