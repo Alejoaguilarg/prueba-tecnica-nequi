@@ -6,6 +6,7 @@ import co.com.bancolombia.api.dto.request.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.request.UpdateStockRequest;
 import co.com.bancolombia.api.dto.response.BranchResponse;
 import co.com.bancolombia.api.dto.response.FranchiseResponse;
+import co.com.bancolombia.api.dto.response.MaxStockProductResponse;
 import co.com.bancolombia.api.dto.response.ProductResponse;
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.ex.BusinessRuleException;
@@ -15,10 +16,7 @@ import co.com.bancolombia.usecase.branch.AddBranchUseCase;
 import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
 import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
 import co.com.bancolombia.usecase.franchise.UpdateFranchiseNameUseCase;
-import co.com.bancolombia.usecase.product.DeleteProductUseCase;
-import co.com.bancolombia.usecase.product.AddProductUseCase;
-import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
-import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
+import co.com.bancolombia.usecase.product.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -27,6 +25,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +39,7 @@ public class Handler {
     private final UpdateProductNameUseCase updateProductNameUseCase;
     private final UpdateBranchNameUseCase updateBranchNameUseCase;
     private final UpdateFranchiseNameUseCase updateFranchiseNameUseCase;
+    private final GetMaxstockProductsUseCase getMaxstockProductsUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -129,6 +129,28 @@ public class Handler {
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(new FranchiseResponse(updated.getName())));
+    }
+
+    public Mono<ServerResponse> getMaxStockProductsByFranchiseId(ServerRequest request) {
+        final Long franchiseId = parseId(request.pathVariable("id"));
+
+        return getMaxstockProductsUseCase
+                .execute(franchiseId)
+                .map(branchTopProduct -> new MaxStockProductResponse(
+                        branchTopProduct.branchName(),
+                        new ProductResponse(branchTopProduct.product().getName(),
+                                branchTopProduct.product().getStock(),
+                                branchTopProduct.product().getBranchId())
+                ))
+                .collectList()
+                .flatMap(list -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(list))
+                .onErrorResume(BusinessRuleException.class, e -> ServerResponse
+                        .badRequest()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(Map.of("Error", e.getMessage())));
     }
 
     private Long parseId(String id) {
