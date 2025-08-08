@@ -1,13 +1,11 @@
 package co.com.bancolombia.api;
 
+import co.com.bancolombia.api.dto.UpdateStockRequest;
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.ex.BusinessRuleException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.product.Product;
-import co.com.bancolombia.usecase.AddBranchUseCase;
-import co.com.bancolombia.usecase.AddProductUseCase;
-import co.com.bancolombia.usecase.CreateFranchiseUseCase;
-import co.com.bancolombia.usecase.DeleteProductUseCase;
+import co.com.bancolombia.usecase.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -25,6 +23,7 @@ public class Handler {
     private final AddBranchUseCase addBranchUseCase;
     private final AddProductUseCase addProductUseCase;
     private final DeleteProductUseCase deleteProductUseCase;
+    private final UpdateProductStockUseCase updateProductStockUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -63,6 +62,18 @@ public class Handler {
         final Long id = parseId(request.pathVariable("id"));
         return deleteProductUseCase.execute(id)
                 .then(ServerResponse.noContent().build());
+    }
+
+    public Mono<ServerResponse> updateProductStock(ServerRequest request) {
+        final Long id = parseId(request.pathVariable("id"));
+        return request
+                .bodyToMono(UpdateStockRequest.class)
+                .flatMap(updateStockRequest -> updateProductStockUseCase
+                        .execute(id, updateStockRequest.stock()))
+                .flatMap(updated -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(updated));
     }
 
     private Long parseId(String id) {

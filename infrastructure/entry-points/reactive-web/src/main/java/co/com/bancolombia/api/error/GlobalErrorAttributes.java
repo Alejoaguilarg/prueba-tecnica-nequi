@@ -27,8 +27,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
                 error.getMessage(),
                 path,
                 Instant.now().toString(),
-                (error instanceof DomainException exception) ? exception.getErrorCode() : "UNKNOWN",
-                Map.of()
+                (error instanceof DomainException exception) ? exception.getErrorCode() : "UNKNOWN"
         );
 
         return Map.of(
@@ -37,8 +36,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
                 "message", response.message(),
                 "path", response.path(),
                 "timestamp", response.timestamp(),
-                "errorCode", response.errorCode(),
-                "details", response.details()
+                "errorCode", response.errorCode()
         );
     }
 }
