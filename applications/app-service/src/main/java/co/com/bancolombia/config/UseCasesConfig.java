@@ -1,5 +1,7 @@
 package co.com.bancolombia.config;
 
+import co.com.bancolombia.model.franchise.gateways.IFranchiseRepository;
+import co.com.bancolombia.model.product.gateways.IProductRepository;
 import co.com.bancolombia.r2dbc.adapters.BranchRepositoryAdapter;
 import co.com.bancolombia.r2dbc.adapters.FranchiseRepositoryAdapter;
 import co.com.bancolombia.r2dbc.adapters.ProductRepositoryAdapter;
@@ -7,10 +9,7 @@ import co.com.bancolombia.usecase.branch.AddBranchUseCase;
 import co.com.bancolombia.usecase.branch.UpdateBranchNameUseCase;
 import co.com.bancolombia.usecase.franchise.CreateFranchiseUseCase;
 import co.com.bancolombia.usecase.franchise.UpdateFranchiseNameUseCase;
-import co.com.bancolombia.usecase.product.DeleteProductUseCase;
-import co.com.bancolombia.usecase.product.AddProductUseCase;
-import co.com.bancolombia.usecase.product.UpdateProductNameUseCase;
-import co.com.bancolombia.usecase.product.UpdateProductStockUseCase;
+import co.com.bancolombia.usecase.product.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -55,5 +54,10 @@ public class UseCasesConfig {
         @Bean
         public UpdateFranchiseNameUseCase updateFranchiseNameUseCase(FranchiseRepositoryAdapter franchiseRepositoryAdapter) {
             return new UpdateFranchiseNameUseCase(franchiseRepositoryAdapter);
+        }
+
+        @Bean
+        public GetMaxstockProductsUseCase getMaxstockProductsUseCase(IProductRepository productRepository, IFranchiseRepository franchiseRepository) {
+            return new GetMaxstockProductsUseCase(productRepository, franchiseRepository);
         }
 }

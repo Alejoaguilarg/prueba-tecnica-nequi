@@ -20,6 +20,7 @@ public class RouterRest {
                 .andRoute(PATCH("/api/products/{id}/stock"), handler::updateProductStock)
                 .andRoute(PATCH("/api/products/{id}/name"), handler::updateProductName)
                 .andRoute(PATCH("/api/branches/{id}/name"), handler::updateBranchName)
-                .andRoute(PATCH("/api/franchises/{id}/name"), handler::updateFranchiseName);
+                .andRoute(PATCH("/api/franchises/{id}/name"), handler::updateFranchiseName)
+                .andRoute(GET("api/franchises/{id}/max-stock-products"), handler::getMaxStockProductsByFranchiseId);
     }
 }
