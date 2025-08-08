@@ -116,4 +116,17 @@ class RouterRestTest {
 
         verify(handler).updateBranchName(any());
     }
+
+    @Test
+    void shouldRouteToUpdateFranchiseName() {
+        when(handler.updateFranchiseName(any())).thenReturn(ServerResponse.ok().build());
+
+        client.patch()
+                .uri("/api/franchises/10/name")
+                .body(BodyInserters.fromValue("another"))
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(handler).updateFranchiseName(any());
+    }
 }

@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class BranchEntity {
 
     @Id
-    @Column("branch_id")
+    @Column("id")
     private Long branchId;
     @Column("name")
     private String name;
