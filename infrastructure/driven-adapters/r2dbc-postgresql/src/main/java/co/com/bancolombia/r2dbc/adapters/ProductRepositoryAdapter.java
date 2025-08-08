@@ -1,6 +1,5 @@
 package co.com.bancolombia.r2dbc.adapters;
 
-import co.com.bancolombia.model.ex.BusinessRuleException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.IProductRepository;
 import co.com.bancolombia.r2dbc.entities.ProductEntity;
