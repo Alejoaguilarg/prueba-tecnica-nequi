@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.DELETE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -15,6 +16,7 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/franchises"), handler::createFranchise)
                 .andRoute(POST("/api/branches"), handler::addBranch)
-                .andRoute(POST("/api/products"), handler::addProduct);
+                .andRoute(POST("/api/products"), handler::addProduct)
+                .andRoute(DELETE("/api/products/{id}"), handler::deleteProduct);
     }
 }

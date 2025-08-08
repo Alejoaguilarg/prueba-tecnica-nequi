@@ -1,13 +1,9 @@
 package co.com.bancolombia.r2dbc.adapters;
 
-import co.com.bancolombia.model.branch.Branch;
-import co.com.bancolombia.model.branch.gateways.IBranchRepository;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.IProductRepository;
-import co.com.bancolombia.r2dbc.entities.BranchEntity;
 import co.com.bancolombia.r2dbc.entities.ProductEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
-import co.com.bancolombia.r2dbc.repositories.BranchRepository;
 import co.com.bancolombia.r2dbc.repositories.ProductRepository;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
@@ -27,5 +23,10 @@ public class ProductRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     public Mono<Product> saveProduct(Product product) {
         return this.save(product);
+    }
+
+    @Override
+    public Mono<Void> deleteProduct(Long id){
+        return repository.deleteById(id);
     }
 }
