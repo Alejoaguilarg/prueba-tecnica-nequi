@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -19,12 +20,12 @@ class RouterRestTest {
     @Mock
     private Handler handler;
 
-    private RouterFunction<ServerResponse> routerFunction;
     private WebTestClient client;
 
     @BeforeEach
     void setUp() {
-        routerFunction = new RouterRest().routerFunction(handler);
+        RouterFunction<ServerResponse> routerFunction = new RouterRest()
+                .routerFunction(handler);
 
         client = WebTestClient.bindToRouterFunction(routerFunction).build();
     }
@@ -70,10 +71,23 @@ class RouterRestTest {
         when(handler.deleteProduct(any())).thenReturn(ServerResponse.ok().build());
 
         client.delete()
-                .uri("/api/products/10")
+                .uri("/api/products/10/stock")
                 .exchange()
                 .expectStatus().isOk();
 
         verify(handler).deleteProduct(any());
+    }
+
+    @Test
+    void shouldRouteToUpdateProductStock() {
+        when(handler.updateProductStock(any())).thenReturn(ServerResponse.ok().build());
+
+        client.patch()
+                .uri("/api/products/10")
+                .body(BodyInserters.fromValue(50))
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(handler).updateProductStock(any());
     }
 }

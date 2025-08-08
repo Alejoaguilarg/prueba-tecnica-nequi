@@ -26,7 +26,7 @@ public class ProductRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<Void> deleteProduct(Long id){
+    public Mono<Void> deleteProduct(Long id) {
         return repository.deleteById(id);
     }
 }

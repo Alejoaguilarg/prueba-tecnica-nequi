@@ -2,9 +2,11 @@ package co.com.bancolombia.api.error;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -14,6 +16,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -39,7 +42,21 @@ public class GlobalErrorWebExceptionHandler
     }
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-        Map<String, Object> m = getErrorAttributes(request, org.springframework.boot.web.error.ErrorAttributeOptions.defaults());
+        Throwable error = getError(request);
+        Map<String, Object> m = getErrorAttributes(request, ErrorAttributeOptions.defaults());
+
+        if (error instanceof DecodingException || error instanceof ServerWebInputException) {
+            return ServerResponse
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new ErrorResponse(
+                            400,
+                            "Bad Request",
+                            "El campo 'stock' debe ser un número entero válido.",
+                            request.path(),
+                            "INVALID_INPUT"
+                    ));
+        }
 
         ErrorResponse body = new ErrorResponse(
                 (int) m.getOrDefault("status", 500),
@@ -54,4 +71,5 @@ public class GlobalErrorWebExceptionHandler
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body);
     }
+
 }
