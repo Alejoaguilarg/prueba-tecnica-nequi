@@ -34,4 +34,9 @@ public class UseCasesConfig {
         public UpdateProductStockUseCase updateProductStockUseCase(ProductRepositoryAdapter productRepositoryAdapter) {
             return new UpdateProductStockUseCase(productRepositoryAdapter);
         }
+
+        @Bean
+        public UpdateProductNameUseCase updateProductNameUseCase(ProductRepositoryAdapter productRepositoryAdapter) {
+            return new UpdateProductNameUseCase(productRepositoryAdapter);
+        }
 }
