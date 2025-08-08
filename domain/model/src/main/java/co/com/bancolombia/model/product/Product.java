@@ -14,4 +14,5 @@ public class Product {
 
     private String name;
     private Integer stock;
+    private Long branchId;
 }
