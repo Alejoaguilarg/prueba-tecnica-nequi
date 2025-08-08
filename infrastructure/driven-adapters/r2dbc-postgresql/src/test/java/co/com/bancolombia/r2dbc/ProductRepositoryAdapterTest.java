@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
+import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -25,11 +26,14 @@ class ProductRepositoryAdapterTest {
     @Mock
     private ObjectMapper mapper;
 
+    @Mock
+    private DatabaseClient client;
+
     private ProductRepositoryAdapter adapter;
 
     @BeforeEach
     void setUp() {
-        adapter = new ProductRepositoryAdapter(productRepository, mapper);
+        adapter = new ProductRepositoryAdapter(productRepository, mapper, client);
     }
 
     @Test

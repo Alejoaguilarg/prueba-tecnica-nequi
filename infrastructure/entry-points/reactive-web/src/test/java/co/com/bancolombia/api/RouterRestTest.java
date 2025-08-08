@@ -129,4 +129,16 @@ class RouterRestTest {
 
         verify(handler).updateFranchiseName(any());
     }
+
+    @Test
+    void shouldRouteToGetMaxStockProducts() {
+        when(handler.getMaxStockProductsByFranchiseId(any())).thenReturn(ServerResponse.ok().build());
+
+        client.get()
+                .uri("/api/franchises/10/max-stock-products")
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(handler).getMaxStockProductsByFranchiseId(any());
+    }
 }
