@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Franchise {
-    private Long franchiseId;
+    private Long id;
     private String name;
 }

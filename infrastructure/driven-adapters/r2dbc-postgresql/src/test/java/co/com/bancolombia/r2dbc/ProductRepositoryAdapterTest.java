@@ -43,7 +43,7 @@ class ProductRepositoryAdapterTest {
                 .build();
 
         ProductEntity entity = new ProductEntity();
-        entity.setId(1L);
+        entity.setProductId(1L);
         entity.setName("Pepsi");
         entity.setStock(100);
         entity.setBranchId(10L);
@@ -80,7 +80,7 @@ class ProductRepositoryAdapterTest {
     void shouldFailOnRepositoryError() {
         Product domain = Product.builder().id(1L).name("X").stock(1).branchId(1L).build();
         ProductEntity entity = new ProductEntity();
-        entity.setId(1L);
+        entity.setProductId(1L);
 
         when(mapper.map(domain, ProductEntity.class)).thenReturn(entity);
         when(productRepository.save(entity)).thenReturn(Mono.error(new RuntimeException("DB error")));
