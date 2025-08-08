@@ -71,7 +71,7 @@ class RouterRestTest {
         when(handler.deleteProduct(any())).thenReturn(ServerResponse.ok().build());
 
         client.delete()
-                .uri("/api/products/10/stock")
+                .uri("/api/products/10")
                 .exchange()
                 .expectStatus().isOk();
 
@@ -83,11 +83,24 @@ class RouterRestTest {
         when(handler.updateProductStock(any())).thenReturn(ServerResponse.ok().build());
 
         client.patch()
-                .uri("/api/products/10")
+                .uri("/api/products/10/stock")
                 .body(BodyInserters.fromValue(50))
                 .exchange()
                 .expectStatus().isOk();
 
         verify(handler).updateProductStock(any());
+    }
+
+    @Test
+    void shouldRouteToUpdateProductName() {
+        when(handler.updateProductName(any())).thenReturn(ServerResponse.ok().build());
+
+        client.patch()
+                .uri("/api/products/10/name")
+                .body(BodyInserters.fromValue("Pepsi"))
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(handler).updateProductName(any());
     }
 }
