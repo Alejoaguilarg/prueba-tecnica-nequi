@@ -1,5 +1,6 @@
 package co.com.bancolombia.api;
 
+import co.com.bancolombia.api.dto.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.UpdateStockRequest;
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.ex.BusinessRuleException;
@@ -24,6 +25,7 @@ public class Handler {
     private final AddProductUseCase addProductUseCase;
     private final DeleteProductUseCase deleteProductUseCase;
     private final UpdateProductStockUseCase updateProductStockUseCase;
+    private final UpdateProductNameUseCase updateProductNameUseCase;
 
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request
@@ -74,6 +76,18 @@ public class Handler {
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(updated));
+    }
+
+    public Mono<ServerResponse> updateProductName(ServerRequest request) {
+        final Long id = parseId(request.pathVariable("id"));
+        return request
+                .bodyToMono(UpdateProductNameRequest.class)
+                .flatMap(updateProductNameRequest -> updateProductNameUseCase
+                        .execute(id,updateProductNameRequest.name())
+                .flatMap(updated -> ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(updated)));
     }
 
     private Long parseId(String id) {
