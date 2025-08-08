@@ -1,9 +1,10 @@
-package co.com.bancolombia.r2dbc;
+package co.com.bancolombia.r2dbc.adapters;
 
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.IFranchiseRepository;
 import co.com.bancolombia.r2dbc.entities.FranchiseEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
+import co.com.bancolombia.r2dbc.repositories.FranchiseRepository;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -16,11 +17,6 @@ public class FranchiseRepositoryAdapter extends ReactiveAdapterOperations<
         FranchiseRepository
 > implements IFranchiseRepository {
     public FranchiseRepositoryAdapter(FranchiseRepository repository, ObjectMapper mapper) {
-        /**
-         *  Could be use mapper.mapBuilder if your domain model implement builder pattern
-         *  super(repository, mapper, d -> mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build());
-         *  Or using mapper.map with the class of the object model
-         */
         super(repository, mapper, d -> mapper.map(d, Franchise.class));
     }
 

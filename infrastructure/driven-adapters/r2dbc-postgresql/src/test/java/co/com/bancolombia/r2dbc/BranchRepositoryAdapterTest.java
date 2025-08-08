@@ -1,9 +1,9 @@
 package co.com.bancolombia.r2dbc;
 
-import co.com.bancolombia.model.franchise.Franchise;
-import co.com.bancolombia.r2dbc.adapters.FranchiseRepositoryAdapter;
-import co.com.bancolombia.r2dbc.entities.FranchiseEntity;
-import co.com.bancolombia.r2dbc.repositories.FranchiseRepository;
+import co.com.bancolombia.model.branch.Branch;
+import co.com.bancolombia.r2dbc.adapters.BranchRepositoryAdapter;
+import co.com.bancolombia.r2dbc.entities.BranchEntity;
+import co.com.bancolombia.r2dbc.repositories.BranchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,27 +20,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FranchiseEntityRepositoryAdapterTest {
+class BranchRepositoryAdapterTest {
 
     @InjectMocks
-    FranchiseRepositoryAdapter repositoryAdapter;
+    BranchRepositoryAdapter repositoryAdapter;
 
     @Mock
-    FranchiseRepository repository;
+    BranchRepository repository;
 
     @Mock
     ObjectMapper mapper;
 
-    private Franchise domain;
-    private FranchiseEntity entity;
+    private Branch domain;
+    private BranchEntity entity;
 
     @BeforeEach
     void init() {
-        domain = Franchise.builder().franchiseId(1L).name("ACME").build();
-        entity = FranchiseEntity.builder().franchiseId(1L).name("ACME").build();
+        domain = Branch.builder().branchId(1L).name("B1").franchiseId(2L).build();
+        entity = BranchEntity.builder().branchId(1L).name("B1").franchiseId(2L).build();
 
-        // mapper from data to domain used in all tests
-        when(mapper.map(entity, Franchise.class)).thenReturn(domain);
+        when(mapper.map(entity, Branch.class)).thenReturn(domain);
     }
 
     @Test
@@ -61,7 +60,7 @@ class FranchiseEntityRepositoryAdapterTest {
 
     @Test
     void mustFindByExample() {
-        when(mapper.map(domain, FranchiseEntity.class)).thenReturn(entity);
+        when(mapper.map(domain, BranchEntity.class)).thenReturn(entity);
         when(repository.findAll(any(Example.class))).thenReturn(Flux.just(entity));
         StepVerifier.create(repositoryAdapter.findByExample(domain))
                 .expectNext(domain)
@@ -70,9 +69,9 @@ class FranchiseEntityRepositoryAdapterTest {
 
     @Test
     void mustSaveValue() {
-        when(mapper.map(domain, FranchiseEntity.class)).thenReturn(entity);
+        when(mapper.map(domain, BranchEntity.class)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(Mono.just(entity));
-        StepVerifier.create(repositoryAdapter.saveFranchise(domain))
+        StepVerifier.create(repositoryAdapter.saveBranch(domain))
                 .expectNext(domain)
                 .verifyComplete();
     }
