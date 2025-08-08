@@ -2,7 +2,7 @@ package co.com.bancolombia.r2dbc.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "adapters.postgres")
+@ConfigurationProperties(prefix = "adapters.r2dbc")
 public record PostgresqlConnectionProperties(
         String host,
         Integer port,
