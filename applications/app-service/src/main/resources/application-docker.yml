@@ -1,0 +1,8 @@
+spring:
+  r2dbc:
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://db:5432/franchises}
+    username: ${SPRING_R2DBC_USERNAME:app}
+    password: ${SPRING_R2DBC_PASSWORD:app}
+
+management:
+  endpoints.web.exposure.include: health,info

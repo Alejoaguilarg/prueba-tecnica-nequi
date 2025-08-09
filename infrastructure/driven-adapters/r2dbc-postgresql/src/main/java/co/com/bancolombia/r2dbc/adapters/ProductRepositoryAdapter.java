@@ -70,5 +70,4 @@ public class ProductRepositoryAdapter extends ReactiveAdapterOperations<
                         .build())
                 .all();
     }
-
 }

@@ -1,4 +1,4 @@
-package co.com.bancolombia.api.config;
+package co.com.bancolombia.config;
 
 import co.com.bancolombia.api.error.GlobalErrorAttributes;
 import co.com.bancolombia.api.error.GlobalErrorWebExceptionHandler;
