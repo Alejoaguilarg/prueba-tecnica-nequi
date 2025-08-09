@@ -1,6 +1,7 @@
 package co.com.bancolombia.r2dbc;
 
 import co.com.bancolombia.model.branch.Branch;
+import co.com.bancolombia.model.valueobjects.BranchTopProduct;
 import co.com.bancolombia.r2dbc.adapters.BranchRepositoryAdapter;
 import co.com.bancolombia.r2dbc.entities.BranchEntity;
 import co.com.bancolombia.r2dbc.repositories.BranchRepository;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.r2dbc.core.RowsFetchSpec;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
