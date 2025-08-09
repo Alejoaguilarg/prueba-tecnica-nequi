@@ -1,7 +1,22 @@
-FROM eclipse-temurin:21-jdk-alpine
-VOLUME /tmp
-COPY *.jar prueba-tecnica-nequi.jar
-ENV JAVA_OPTS=" -Xshareclasses:name=cacheapp,cacheDir=/cache,nonfatal -XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
-# Replace with a non-root user to avoid running the container with excessive privileges
-USER appuser
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS  -jar prueba-tecnica-nequi.jar" ]
+# ---------- BUILD ----------
+FROM gradle:8.9-jdk21-alpine AS build
+WORKDIR /workspace
+
+COPY settings.gradle build.gradle main.gradle gradle/ ./
+COPY settings.gradle build.gradle main.gradle gradle.properties gradle/ ./
+
+# Copia módulos físicos del scaffold
+COPY applications/ applications/
+COPY domain/ domain/
+COPY infrastructure/ infrastructure/
+
+RUN gradle :app-service:bootJar --no-daemon
+
+# ---------- RUNTIME ----------
+FROM eclipse-temurin:21-jre-alpine
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
+WORKDIR /app
+COPY --from=build /workspace/applications/app-service/build/libs/*.jar app.jar
+EXPOSE 8080
+USER 1001
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Dspring.profiles.active=docker -jar app.jar"]

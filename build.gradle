@@ -34,4 +34,28 @@ sonar {
     }
 }
 
+// Jacoco
+subprojects {
+    pluginManager.withPlugin('java') {
+        apply plugin: 'jacoco'
+        jacoco { toolVersion = jacocoVersion }
+
+        tasks.withType(Test).configureEach {
+            useJUnitPlatform()
+            finalizedBy('jacocoTestReport')
+        }
+
+        tasks.named('jacocoTestReport') {
+            reports { xml.required = true; html.required = true; csv.required = false }
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    def javaProjects = subprojects.findAll { it.plugins.hasPlugin('java') }
+    tasks.register('jacocoRootReport') {
+        dependsOn javaProjects.collect { it.tasks.named('jacocoTestReport') }
+    }
+}
+
 apply from: './main.gradle'
