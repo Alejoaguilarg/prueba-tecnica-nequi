@@ -46,6 +46,9 @@ CREATE TABLE products (
 );
 ```
 
+### Diagrama relacional 
+![img.png](img.png)
+
 ---
 
 ## 4. Endpoints (RESTful)
@@ -138,8 +141,128 @@ curl http://localhost:8080/api/franchises/1/max-stock-products
 ```
 
 ---
+## 7. Demo pública (Render)
+```
+Base URL: https://prueba-tecnica-nequi.onrender.com
 
-## 7. Pruebas y cobertura
+Health
+
+curl https://prueba-tecnica-nequi.onrender.com/actuator/health
+
+Probar endpoints (IDs de ejemplo)
+
+Si algún ID no existe, crea primero los recursos con los POST de la sección de ejemplos.
+
+Max stock por sucursal (franquicia 1)
+
+curl https://prueba-tecnica-nequi.onrender.com/api/franchises/1/max-stock-products
+
+Actualizar stock de un producto
+
+curl -X PATCH https://prueba-tecnica-nequi.onrender.com/api/products/1/stock \
+-H 'Content-Type: application/json' \
+-d '{"stock":140}'
+```
+ ### Crear datos (demo)
+
+### Crear franquicia
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/franchises \
+-H 'Content-Type: application/json' \
+-d '{"name":"Franquicia B"}'
+
+### Crear sucursal en la franquicia 1
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/franchises/1/branches \
+-H 'Content-Type: application/json' \
+-d '{"name":"Sucursal Centro"}'
+
+### Crear producto en la sucursal 1
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/branches/1/products \
+-H 'Content-Type: application/json' \
+-d '{"name":"Sprite","stock":50}'
+
+### Crear franquicia
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/franchises \
+-H 'Content-Type: application/json' \
+-d '{"name":"Franquicia B"}'
+
+### Crear sucursal en la franquicia 1
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/franchises/1/branches \
+-H 'Content-Type: application/json' \
+-d '{"name":"Sucursal Centro"}'
+
+### Crear producto en la sucursal 1
+curl -X POST https://prueba-tecnica-nequi.onrender.com/api/branches/1/products \
+-H 'Content-Type: application/json' \
+-d '{"name":"Sprite","stock":50}'
+
+Notas
+
+Las respuestas de error siguen el contrato descrito en Formato de errores.
+
+CORS está configurado; si consumes desde un frontend distinto, añade su origen en el application-docker.yml.
+
+---
+## 8. Cloud
+## ☁️ Infraestructura en AWS con Terraform
+
+Este proyecto puede aprovisionar automáticamente la base de datos en AWS RDS usando **Terraform**.
+
+### 1) ¿Qué se aprovisiona?
+- **RDS PostgreSQL** en AWS (región `us-west-2`).
+- **Security Group** con acceso limitado al puerto `5432` para la IP configurada en `allowed_cidr`.
+- **Variables de conexión** expuestas como outputs (`db_host`, `db_port`, `db_name`, `db_username`, `db_password`).
+
+---
+
+### 2) Comandos usados
+```
+Inicializar Terraform:
+terraform init
+
+Planificar la infraestructura:
+terraform plan -out plan.out
+
+aplicar cambios:
+terraform apply "plan.out"
+```
+### 3) Variables utilizadas
+   Al ejecutar terraform plan se solicitan:
+```
+allowed_cidr → Rango de IP que tendrá acceso al RDS (ejemplo: TU.IP/32).
+
+db_password → Contraseña para el usuario root.
+```
+
+### 4) Estado final en AWS
+Base de datos: prueba_tecnica
+
+Host: franchises-postgres.creme2ee8a4e.us-west-2.rds.amazonaws.com
+
+Usuario: root
+
+Puerto: 5432
+
+Password: configurada en Terraform (db_password).
+
+SSL: requerido para conexiones externas (sslmode=require).
+
+### 5) Carga de datos (Seeds)
+   Para inicializar la base de datos con datos de prueba:
+
+```bash
+PGPASSWORD='1234567890' psql \
+"host=franchises-postgres.creme2ee8a4e.us-west-2.rds.amazonaws.com \
+port=5432 \
+dbname=prueba_tecnica \
+user=root \
+sslmode=require" \
+-f seed.sql
+```
+
+---
+
+## 8. Pruebas y cobertura
+
 ### Ejecutar tests
 ```bash
 ./gradlew clean test
@@ -160,16 +283,60 @@ Umbral recomendado: `>= 70%` global (configurable con `JacocoCoverageVerificatio
 
 ---
 
-## 8. Observabilidad y logging
+## 9. Observabilidad y logging
 - **Actuator:** `/actuator/health`, `/info`.
 - **Logging:** Log4j2; niveles configurables por perfil.
 
 ---
 
-## 9. Decisiones de diseño (resumen)
-- **WebFlux + R2DBC**: IO no bloqueante para escalar con menos hilos.
-- **Hexagonal**: dominio aislado; cambia la infraestructura sin afectar casos de uso.
-- **DTOs de salida**: nunca exponemos entidades internas.
-- **Manejo de errores centralizado**: respuestas consistentes; mapping explícito de 400/404/500.
-- **CORS** vía YAML en perfil `docker` para evitar colisiones de beans.
+## 10. Consideraciones de Diseño
 
+El proyecto sigue una arquitectura **Hexagonal** con separación clara entre capas (`domain`, `usecase`, `infrastructure`, `app-service`), aplicando principios de **Clean Architecture** y **SOLID** para asegurar mantenibilidad, escalabilidad y facilidad de prueba.
+
+---
+
+### 1) Módulos y Responsabilidades
+- **domain** → Modelos, entidades y lógica de negocio pura.
+- **usecase** → Casos de uso que orquestan la lógica de negocio.
+- **infrastructure** → Adaptadores para persistencia (R2DBC Postgres), controladores WebFlux y configuración de infraestructura.
+- **app-service** → Módulo Boot principal que ejecuta la aplicación.
+
+---
+
+### 2) Calidad y Cobertura de Código
+Se configuró **JaCoCo** para obtener un reporte unificado de cobertura de pruebas:
+- `./gradlew clean test jacocoRootReport` genera reportes agregados para todos los módulos.
+- Uso de `jacocoTestReport` en cada módulo para medición individual.
+- Reportes centralizados en `build/reports/jacoco/rootReport`.
+
+---
+
+### 3) Despliegue y Ejecución
+
+#### **A) Render**
+- Despliegue de la aplicación directamente desde el repositorio en GitHub.
+- Configuración de base de datos PostgreSQL gestionada por Render.
+- URL pública del servicio:  
+  https://prueba-tecnica-nequi.onrender.com
+- Ventajas: Hosting gratuito, configuración rápida, integración continua con GitHub.
+
+#### **B) AWS con Terraform**
+- Aprovisionamiento de **AWS RDS PostgreSQL** con **Terraform**:
+- Creación automática de la base de datos, usuario, contraseña y security group.
+- Restricción de acceso mediante variable `allowed_cidr` (solo IP autorizada).
+- Variables de conexión expuestas como outputs (`db_host`, `db_name`, `db_username`, `db_password`, `db_port`).
+
+### 4) Consideraciones Técnicas Clave
+   Spring WebFlux para un modelo completamente reactivo y no bloqueante.
+R2DBC para interacción reactiva con PostgreSQL.
+Manejo global de errores implementado con GlobalErrorWebExceptionHandler y GlobalErrorAttributes personalizados.
+Validaciones con @Valid y @NotNull en DTOs.
+Tests unitarios e integrales con WebTestClient y reportes de cobertura centralizados.
+Docker Compose para ejecución local, incluyendo aplicación y base de datos PostgreSQL.
+Semillas (Seeds) para carga inicial de datos tanto en local como en nube.
+
+### 5) Escalabilidad y Futuras Mejoras
+   Añadir CI/CD completo con GitHub Actions o AWS CodePipeline para despliegue automático en AWS.
+Monitoreo y logging centralizado con CloudWatch o Grafana.
+Implementar métricas de performance con Micrometer y Prometheus.
+Uso de AWS ECS o EKS para orquestar contenedores y escalar horizontalmente.
